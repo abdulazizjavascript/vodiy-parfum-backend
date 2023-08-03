@@ -5,15 +5,15 @@ const authAdmin = require("../middleware/authAdmin");
 
 router.route("/lastTenDayStatics/:id").get(productCtrl.getLastTenDayStatics);
 router.route("/statics").get(productCtrl.getStatics);
-router.route("/lastProducts").get(productCtrl.getLastCategoryProducts);
+router.route("/last-products").get(productCtrl.getLastCategoryProducts);
 
 router
-  .route("/products")
+  .route("/product")
   .get(productCtrl.getProducts)
   .post(auth, authAdmin, productCtrl.createProduct);
 
 router
-  .route("/products/:id")
+  .route("/product/:id")
   .delete(auth, authAdmin, productCtrl.deleteProduct)
   .put(auth, authAdmin, productCtrl.updateProduct);
 

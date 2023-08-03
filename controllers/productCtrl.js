@@ -91,15 +91,17 @@ const productCtrl = {
     try {
       const features = new APIfeatures(Products.find(), req.query)
         .filtering()
-        .sorting()
-        .paginating();
+        .sorting();
 
-      const products = await features.query;
-      const total = await Products.find().countDocuments();
+      const total = await features.query;
+
+      const featuresWithPgntn = features.paginating();
+
+      const products = await featuresWithPgntn.query;
+      
       res.json({
-        status: "success",
-        total,
-        products: products,
+        total: total.length,
+        products,
       });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
