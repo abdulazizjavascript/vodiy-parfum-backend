@@ -1,33 +1,25 @@
 const mongoose = require("mongoose");
 
+const userCart = new mongoose.Schema({
+  product: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Products",
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+});
+
 const paymentSchema = new mongoose.Schema(
   {
-    user_id: {
-      type: String,
-      required: true,
-    },
-    name: {
-      type: String,
-      required: true,
-    },
-    lname: {
-      type: String,
-      required: true,
-    },
-    login: {
-      type: String,
-      required: true,
-    },
-    phoneNumber: {
-      type: String,
-      required: true,
-    },
-    address: {
+    userId: {
       type: String,
       required: true,
     },
     cart: {
-      type: Array,
+      type: [userCart],
       default: [],
     },
     comment: {

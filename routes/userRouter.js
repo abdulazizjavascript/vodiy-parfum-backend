@@ -1,24 +1,17 @@
 const router = require("express").Router();
-const userCtrl = require("../controllers/userCtrl");
+const {
+  getUsers,
+  getUser,
+  updateUser,
+  deleteUser,
+} = require("../controllers/authCtrl");
 const auth = require("../middleware/auth");
 const authAdmin = require("../middleware/authAdmin");
 
-router.post("/register", userCtrl.register);
+router.use(auth);
+router.use(authAdmin);
 
-router.post("/login", userCtrl.login);
-
-router.get("/logout", userCtrl.logout);
-
-router.get("/refresh_token", userCtrl.refreshToken);
-
-router.get("/infor", auth, userCtrl.getUser);
-
-router.get("/users", auth, authAdmin, userCtrl.getUsers);
-router.put("/users/:id", auth, authAdmin, userCtrl.updateUser);
-router.delete("/users/:id", auth, authAdmin, userCtrl.deleteUser);
-
-router.patch("/addcart", auth, userCtrl.addCart);
-
-router.get("/history", auth, userCtrl.history);
+router.get("/", getUsers);
+router.route("/:id").get(getUser).put(updateUser).delete(deleteUser);
 
 module.exports = router;

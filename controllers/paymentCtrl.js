@@ -13,39 +13,49 @@ const paymentCtrl = {
   },
   createPayment: async (req, res) => {
     try {
-      const user = await Users.findById(req.user.id).select(
-        "name lname login phoneNumber address"
-      );
+      const user = await Users.findById(req.user.id);
+
       if (!user)
         return res.status(400).json({ msg: "Foydalanuvchi mavjud emas !" });
-      const { cart2, comment } = req.body;
 
-      const { _id, name, lname, login, phoneNumber, address } = user;
+      const { cart, comment } = req.body;
 
-      // cart.forEach((item) => {
-      //   if (item.quantity > item.number) {
-      //     return res
-      //       .status(400)
-      //       .json({ msg: "Bizda buncha mahsulot mavjud emas !" });
-      //   }
-      // });
+      cart.forEach(async (item) => {
+        const product = await Products.findById(item.product);
+        console.log(product);
+        if (product.quantity < item.quantity) {
+          return res
+            .status(400)
+            .json({ msg: "Bizda buncha mahsulot mavjud emas !" });
+        }
+      });
+
+      const check = cart.every((el) => el.product && el.quantity);
+      if (!check) {
+        return res.status(400).json({
+          msg: "Every object must have product and quantity property !",
+        });
+      }
 
       const newPayment = new Payments({
-        user_id: _id,
-        name,
-        lname,
-        login,
-        address,
-        phoneNumber,
-        cart: cart2,
+        userId: user._id,
+        cart,
         comment,
       });
 
-      cart2.filter((item) => {
-        return sold(item._id, item.quantity, item.sold, item.number);
+      await newPayment.save();
+
+      cart.forEach(async ({ product: id, quantity }) => {
+        const product = await Products.findById(id);
+        await Products.findOneAndUpdate(
+          { _id: id },
+          {
+            sold: product.sold + quantity,
+            quantity: product.quantity - quantity,
+          }
+        );
       });
 
-      await newPayment.save();
       res.json({ msg: "Buyurtmangiz jo'natildi", newPayment });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
@@ -61,16 +71,6 @@ const paymentCtrl = {
       return res.status(500).json({ msg: err.message });
     }
   },
-};
-
-const sold = async (id, quantity, oldSold, number) => {
-  await Products.findOneAndUpdate(
-    { _id: id },
-    {
-      sold: quantity + oldSold,
-      number: number - quantity,
-    }
-  );
 };
 
 module.exports = paymentCtrl;

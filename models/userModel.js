@@ -1,18 +1,18 @@
-const mongoose = require('mongoose')
+const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    name: {
+    firstName: {
       type: String,
       required: true,
       trim: true,
     },
-    lname: {
+    lastName: {
       type: String,
       required: true,
       trim: true,
     },
-    login: {
+    username: {
       type: String,
       required: true,
       unique: true,
@@ -23,19 +23,15 @@ const userSchema = new mongoose.Schema(
     },
     address: {
       type: String,
-      required: true,
     },
     password: {
       type: String,
       required: true,
+      select: false,
     },
     role: {
       type: Number,
       default: 0,
-    },
-    cart: {
-      type: Array,
-      default: [],
     },
   },
   {
@@ -43,4 +39,4 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model('Users', userSchema)
+module.exports = mongoose.model("Users", userSchema);

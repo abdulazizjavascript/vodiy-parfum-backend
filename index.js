@@ -1,4 +1,3 @@
-require("dotenv").config();
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
@@ -6,7 +5,10 @@ const fileUpload = require("express-fileupload");
 const cookieParser = require("cookie-parser");
 const path = require("path");
 
+require("dotenv").config();
+
 const app = express();
+
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors());
@@ -17,17 +19,16 @@ app.use(
 );
 
 // Routes
-app.use("/api/v1/auth", require("./routes/userRouter"));
+app.use("/api/v1/user", require("./routes/userRouter"));
+app.use("/api/v1/auth", require("./routes/authRouter"));
 app.use("/api/v1", require("./routes/categoryRouter"));
-app.use("/api/v1", require("./routes/addressRouter"));
 app.use("/api/v1", require("./routes/upload"));
 app.use("/api/v1", require("./routes/productRouter"));
 app.use("/api/v1", require("./routes/paymentRouter"));
 
 // Connect to mongodb
-const URI = process.env.MONGODB_URL;
 mongoose.connect(
-  URI,
+  process.env.MONGODB_URL,
   {
     useCreateIndex: true,
     useFindAndModify: false,

@@ -14,14 +14,14 @@ const categoryCtrl = {
     try {
       // if user have role = 1 ---> admin
       // only admin can create , delete and update category
-      const { name, images } = req.body;
-      if (!images) return res.status(400).json({ msg: "Rasm joylanmagan !" });
+      const { name, image } = req.body;
+      if (!image) return res.status(400).json({ msg: "Rasm joylanmagan !" });
 
       const category = await Category.findOne({ name });
       if (category)
         return res.status(400).json({ msg: "Bu kategoriya mavjud" });
 
-      const newCategory = new Category({ name, images });
+      const newCategory = new Category({ name, image });
 
       await newCategory.save();
       res.json({ msg: "Kategoriya yaratildi" });
@@ -45,8 +45,8 @@ const categoryCtrl = {
   },
   updateCategory: async (req, res) => {
     try {
-      const { name, images } = req.body;
-      await Category.findOneAndUpdate({ _id: req.params.id }, { name, images });
+      const { name, image } = req.body;
+      await Category.findOneAndUpdate({ _id: req.params.id }, { name, image });
 
       res.json({ msg: "Kategoriya yangilandi" });
     } catch (err) {

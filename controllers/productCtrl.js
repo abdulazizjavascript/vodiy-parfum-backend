@@ -35,7 +35,7 @@ const getDayProducts = (products, cart) => {
         category: product.category,
         quantity: product.quantity,
         price: product.price,
-        images: product.images,
+        image: product.image,
       });
     }
   });
@@ -98,7 +98,7 @@ const productCtrl = {
       const featuresWithPgntn = features.paginating();
 
       const products = await featuresWithPgntn.query;
-      
+
       res.json({
         total: total.length,
         products,
@@ -126,22 +126,23 @@ const productCtrl = {
   },
   getStatics: async (req, res) => {
     try {
-      const payments_number = (await Payments.find({ status: false })).length;
-      const products_number = (await Products.find()).length;
-      const users_number = (await Users.find({ role: 0 })).length;
-      const common_numbers = {
-        payments_number,
-        products_number,
-        users_number,
+      const paymentsNumber = (await Payments.find({ status: false })).length;
+      const productsNumber = (await Products.find()).length;
+      const usersNumber = (await Users.find({ role: 0 })).length;
+
+      const commonNumbers = {
+        paymentsNumber,
+        productsNumber,
+        usersNumber,
       };
-      res.json(common_numbers);
+      res.json(commonNumbers);
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
   },
   getLastTenDayStatics: async (req, res) => {
     try {
-      const today_date = new Date();
+      const todayDate = new Date();
       const payments = await Payments.find();
       days = parseInt(req.params.id);
 
@@ -154,11 +155,11 @@ const productCtrl = {
           payments.filter(
             (item) =>
               newDate(item.createdAt) ===
-              newDate(new Date(today_date.getTime() - i * 24 * 60 * 60 * 1000))
+              newDate(new Date(todayDate.getTime() - i * 24 * 60 * 60 * 1000))
           )
         );
         dates[i] = newDate(
-          new Date(today_date.getTime() - i * 24 * 60 * 60 * 1000)
+          new Date(todayDate.getTime() - i * 24 * 60 * 60 * 1000)
         );
       }
 
@@ -189,8 +190,8 @@ const productCtrl = {
   },
   createProduct: async (req, res) => {
     try {
-      const { title, price, description, images, number, category } = req.body;
-      if (!images) return res.status(400).json({ msg: "Rasm joylanmagan !" });
+      const { title, price, description, image, quantity, category } = req.body;
+      if (!image) return res.status(400).json({ msg: "Rasm joylanmagan !" });
 
       const product = await Products.findOne({ title });
       if (product) return res.status(400).json({ msg: "Bu mahsulot mavjud !" });
@@ -199,8 +200,8 @@ const productCtrl = {
         title,
         price,
         description,
-        images,
-        number,
+        image,
+        quantity,
         category,
       });
 
@@ -221,8 +222,8 @@ const productCtrl = {
   },
   updateProduct: async (req, res) => {
     try {
-      const { title, price, description, images, number, category } = req.body;
-      if (!images) return res.status(400).json({ msg: "Rasm joylanmadi !" });
+      const { title, price, description, image, quantity, category } = req.body;
+      if (!image) return res.status(400).json({ msg: "Rasm joylanmadi !" });
 
       await Products.findOneAndUpdate(
         { _id: req.params.id },
@@ -230,8 +231,8 @@ const productCtrl = {
           title,
           price,
           description,
-          images,
-          number,
+          image,
+          quantity,
           category,
         }
       );
