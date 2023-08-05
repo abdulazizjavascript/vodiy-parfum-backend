@@ -5,6 +5,7 @@ const {
   updateUser,
   deleteUser,
 } = require("../controllers/userCtrl");
+
 const auth = require("../middleware/auth");
 const authAdmin = require("../middleware/authAdmin");
 
