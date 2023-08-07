@@ -89,7 +89,13 @@ class APIfeatures {
 const productCtrl = {
   getProducts: async (req, res) => {
     try {
-      const features = new APIfeatures(Products.find(), req.query)
+      const features = new APIfeatures(
+        Products.find().populate({
+          path: "category",
+          model: "Category",
+        }),
+        req.query
+      )
         .filtering()
         .sorting();
 
@@ -238,6 +244,14 @@ const productCtrl = {
       );
 
       res.json({ msg: "Mahsulot o'zgartirildi" });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  getProduct: async (req, res) => {
+    try {
+      const product = await Products.findById(req.params.id);
+      res.status(200).json(product);
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }

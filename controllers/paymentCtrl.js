@@ -6,6 +6,7 @@ const paymentCtrl = {
   getPayments: async (req, res) => {
     try {
       const payments = await Payments.find({ status: req.params.id });
+
       res.json(payments);
     } catch (err) {
       return res.status(500).json({ msg: err.message });

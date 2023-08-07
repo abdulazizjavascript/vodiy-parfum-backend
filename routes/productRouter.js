@@ -14,6 +14,7 @@ router
 
 router
   .route("/product/:id")
+  .get(productCtrl.getProduct)
   .delete(auth, authAdmin, productCtrl.deleteProduct)
   .put(auth, authAdmin, productCtrl.updateProduct);
 

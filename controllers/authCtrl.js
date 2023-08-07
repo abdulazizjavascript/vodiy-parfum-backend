@@ -2,6 +2,7 @@ const Users = require("../models/userModel");
 const Payments = require("../models/paymentModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
+const categoryModel = require("../models/categoryModel");
 
 const authCtrl = {
   register: async (req, res) => {
@@ -110,7 +111,13 @@ const authCtrl = {
   },
   getUserPayments: async (req, res) => {
     try {
-      const payments = await Payments.find({ userId: req.user.id });
+      const payments = await Payments.find({ userId: req.user.id }).populate({
+        path: "cart.product",
+        populate: {
+          path: "category",
+          model: "Category",
+        },
+      });
 
       res.json(payments);
     } catch (err) {
