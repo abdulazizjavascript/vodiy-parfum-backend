@@ -100,8 +100,7 @@ class APIfeatures {
       },
       { $or: [] }
     );
-    console.log(searchQuery);
-    this.query = this.query.find(searchQuery);
+    this.queryString.search && (this.query = this.query.find(searchQuery));
 
     return this;
   }
