@@ -52,7 +52,7 @@ class APIfeatures {
   filtering() {
     const queryObj = { ...this.queryString }; //queryString = req.query
 
-    const excludedFields = ["page", "sort", "limit"];
+    const excludedFields = ["page", "sort", "limit", "search"];
     excludedFields.forEach((el) => delete queryObj[el]);
 
     let queryStr = JSON.stringify(queryObj);
@@ -84,6 +84,27 @@ class APIfeatures {
     this.query = this.query.skip(skip).limit(limit);
     return this;
   }
+
+  searching() {
+    // All the datas
+    const searchQuery = ["title", "description"].reduce(
+      (acc, el) => {
+        let searchEl = {
+          [el]: {
+            $regex: this.queryString.search,
+            $options: "i",
+          },
+        };
+        acc["$or"].push(searchEl);
+        return acc;
+      },
+      { $or: [] }
+    );
+    console.log(searchQuery);
+    this.query = this.query.find(searchQuery);
+
+    return this;
+  }
 }
 
 const productCtrl = {
@@ -97,7 +118,8 @@ const productCtrl = {
         req.query
       )
         .filtering()
-        .sorting();
+        .sorting()
+        .searching();
 
       const total = await features.query;
 
