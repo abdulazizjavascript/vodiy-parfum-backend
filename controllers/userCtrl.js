@@ -23,7 +23,7 @@ const userCtrl = {
     try {
       const { firstName, lastName, username, phoneNumber, password } = req.body;
 
-      await Users.findOneAndUpdate(
+      const user = await Users.findOneAndUpdate(
         { _id: req.params.id },
         {
           firstName,
@@ -31,10 +31,14 @@ const userCtrl = {
           username,
           phoneNumber,
           password,
+        },
+        {
+          new: true,
+          runValidors: true,
         }
       );
 
-      res.json({ msg: "Foydaluvchi o'zgartirildi" });
+      res.json(user);
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
@@ -48,5 +52,6 @@ const userCtrl = {
     }
   },
 };
+
 
 module.exports = userCtrl;

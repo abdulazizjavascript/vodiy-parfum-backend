@@ -2,7 +2,6 @@ const Users = require("../models/userModel");
 const Payments = require("../models/paymentModel");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
-const categoryModel = require("../models/categoryModel");
 
 const authCtrl = {
   register: async (req, res) => {
@@ -12,16 +11,12 @@ const authCtrl = {
       const user = await Users.findOne({ username });
       if (user) return res.status(400).json({ msg: "Bu foydalanuvchi mavjud" });
 
-      if (password.length < 6)
-        return res.status(400).json({ msg: "Kodning minimal uzunligi 6 " });
-
-      const passwordHash = await bcrypt.hash(password, 10);
       const newUser = new Users({
         firstName,
         lastName,
         username,
         phoneNumber,
-        password: passwordHash,
+        password,
       });
 
       await newUser.save();
@@ -122,6 +117,45 @@ const authCtrl = {
       res.json(payments);
     } catch (err) {
       return res.status(500).json({ msg: err.message });
+    }
+  },
+  updateUser: async (req, res) => {
+    try {
+      const { firstName, lastName, username, phoneNumber } = req.body;
+
+      const user = await Users.findByIdAndUpdate(
+        req.user.id,
+        { firstName, lastName, username, phoneNumber },
+        {
+          new: true,
+          runValidors: true,
+        }
+      );
+
+      res.status(200).json(user);
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  updatePassword: async (req, res) => {
+    try {
+      const user = await Users.findById(req.user.id).select("+password");
+
+      // Check current password
+      const isMatch = await bcrypt.compare(
+        req.body.currentPassword,
+        user.password
+      );
+      if (!isMatch)
+        return res.status(400).json({ msg: "Current password is wrong !" });
+
+      user.password = req.body.newPassword;
+
+      await user.save();
+
+      res.status(200).json(user);
+    } catch (err) {
+      return res.status(400).json({ msg: err.message });
     }
   },
 };

@@ -12,6 +12,10 @@ router.get("/refresh_token", auth, authCtrl.refreshToken);
 
 router.get("/me", auth, authCtrl.getMe);
 
+router.put("/update", auth, authCtrl.updateUser);
+
+router.put("/password", auth, authCtrl.updatePassword);
+
 router.get("/payments", auth, authCtrl.getUserPayments);
 
 module.exports = router;
