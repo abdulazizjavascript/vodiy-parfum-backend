@@ -32,7 +32,7 @@ const categoryCtrl = {
       const newCategory = new Category({ name, image });
 
       await newCategory.save();
-      res.json({ msg: "Kategoriya yaratildi" });
+      res.json(newCategory);
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }

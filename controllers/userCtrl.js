@@ -19,6 +19,31 @@ const userCtrl = {
       return res.status(500).json({ msg: err.message });
     }
   },
+  createUser: async (req, res) => {
+    try {
+      const { firstName, lastName, username, phoneNumber, password } = req.body;
+      const user = await Users.findOne({ username });
+
+      if (user) return res.status(400).json({ msg: "This user exists !" });
+
+      const newUser = new Users({
+        firstName,
+        lastName,
+        username,
+        phoneNumber,
+        password,
+      });
+
+      
+      await newUser.save();
+      
+      newUser.password = undefined;
+
+      res.json(newUser);
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
   updateUser: async (req, res) => {
     try {
       const { firstName, lastName, username, phoneNumber, password } = req.body;
@@ -46,12 +71,11 @@ const userCtrl = {
   deleteUser: async (req, res) => {
     try {
       await Users.findByIdAndDelete(req.params.id);
-      res.json({ msg: "Foydalanuvchi o'chirildi" });
+      res.json({ msg: `The user with ${req.params.id} is deleted !` });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
   },
 };
-
 
 module.exports = userCtrl;
