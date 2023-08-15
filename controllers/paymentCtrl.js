@@ -5,7 +5,7 @@ const Products = require("../models/productModel");
 const paymentCtrl = {
   getPayments: async (req, res) => {
     try {
-      const payments = await Payments.find({ status: req.params.id });
+      const payments = await Payments.find();
 
       res.json(payments);
     } catch (err) {
@@ -17,17 +17,16 @@ const paymentCtrl = {
       const user = await Users.findById(req.user.id);
 
       if (!user)
-        return res.status(400).json({ msg: "Foydalanuvchi mavjud emas !" });
+        return res.status(400).json({ msg: "This user doesn't exist !" });
 
       const { cart, comment } = req.body;
 
       cart.forEach(async (item) => {
         const product = await Products.findById(item.product);
-        console.log(product);
         if (product.quantity < item.quantity) {
           return res
             .status(400)
-            .json({ msg: "Bizda buncha mahsulot mavjud emas !" });
+            .json({ msg: "We don't have that many products!" });
         }
       });
 
@@ -65,9 +64,30 @@ const paymentCtrl = {
   sendConfirm: async (req, res) => {
     try {
       const product = await Payments.findOne({ _id: req.params.id });
-      product.status = true;
+      product.status = "SUCCESS";
       await Payments.findOneAndUpdate({ _id: req.params.id }, product);
-      res.json({ msg: "Buyurtma yetkazib berildi !" });
+      res.json({ msg: "The order has been delivered!" });
+    } catch (err) {
+      return res.status(500).json({ msg: err.message });
+    }
+  },
+  cancelPayment: async (req, res) => {
+    try {
+      const payment = await Payments.findById(req.params.id);
+      payment.cart.forEach(async (item) => {
+        let product = await Products.findById(item._id);
+        await Products.findOneAndUpdate(
+          { _id: item._id },
+          { number: product.number + item.quantity }
+        );
+      });
+      await Payments.findOneAndUpdate(
+        { _id: req.params.id },
+        {
+          status: "CANCELED",
+        }
+      );
+      res.json({ msg: "The order canceled!" });
     } catch (err) {
       return res.status(500).json({ msg: err.message });
     }
