@@ -75,10 +75,10 @@ const paymentCtrl = {
     try {
       const payment = await Payments.findById(req.params.id);
       payment.cart.forEach(async (item) => {
-        let product = await Products.findById(item._id);
+        let product = await Products.findById(item.product);
         await Products.findOneAndUpdate(
-          { _id: item._id },
-          { number: product.number + item.quantity }
+          { _id: item.product },
+          { quantity: product.quantity + item.quantity }
         );
       });
       await Payments.findOneAndUpdate(
