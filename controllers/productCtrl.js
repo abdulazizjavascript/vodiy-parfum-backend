@@ -218,6 +218,11 @@ const productCtrl = {
   createProduct: async (req, res) => {
     try {
       const { title, price, description, image, quantity, category } = req.body;
+      const categoryFound = await Category.findById(category);
+
+      if (!categoryFound)
+        return res.status(400).json({ msg: "Kategoriya mavjud emas !" });
+
       if (!image) return res.status(400).json({ msg: "Rasm joylanmagan !" });
 
       const product = await Products.findOne({ title });
